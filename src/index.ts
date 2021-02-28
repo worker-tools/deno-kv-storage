@@ -1,4 +1,5 @@
 import { StorageArea, AllowedKey, Key } from 'https://cdn.skypack.dev/kv-storage-interface@^0.2.0/index.d.ts';
+
 import Typeson from 'https://cdn.skypack.dev/typeson@^5.18.2';
 import structuredCloningThrowing from 'https://cdn.skypack.dev/typeson-registry/dist/presets/structured-cloning-throwing.js';
 
