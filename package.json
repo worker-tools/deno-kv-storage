@@ -1,18 +1,25 @@
 {
-  "name": "deno-kv-storage",
-  "version": "1.0.0",
+  "name": "@worker-tools/deno-kv-storage",
   "description": "",
-  "main": "index.js",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "deno run --allow-read test/index.ts",
+    "prepack": "npm run build",
+    "build": "mkdir -p dist && deno bundle src/mod.ts > dist/index.js"
   },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "typescript": "^4.2.2"
-  },
+  "author": "Florian Klampfer <mail@qwtel.com> (https://qwtel.com/)",
+  "license": "MIT",
   "dependencies": {
-    "base64-encoding": "^0.14.3",
-    "kv-storage-interface": "^0.1.2"
+    "kv-storage-interface": "^0.2.0"
   }
 }
