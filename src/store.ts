@@ -6,4 +6,5 @@ export interface Store {
   keys(): AsyncIterableIterator<string>;
   values(): AsyncIterableIterator<string>;
   entries(): AsyncIterableIterator<[string, string]>;
+  backingStore(): unknown;
 }

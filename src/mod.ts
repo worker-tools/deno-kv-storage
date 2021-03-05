@@ -4,13 +4,15 @@ import Typeson from 'https://cdn.skypack.dev/typeson@^5.18.2';
 import structuredCloningThrowing from 'https://cdn.skypack.dev/typeson-registry/dist/presets/structured-cloning-throwing.js';
 
 import { Store } from './store.ts';
-import { SQLiteStore } from './store-sqlite.ts';
-// import { PostgresStore } from './store-postgres.ts';
+import { SQLiteStore } from './sqlite-store.ts';
+// import { PostgresStore } from './postgres-store.ts';
 
 import { throwForDisallowedKey } from './common.ts';
 import { encodeKey, decodeKey } from './key-encoding.ts';
 
-// // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
+const DEFAULT_STORAGE_AREA_NAME = 'default';
+
+// https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
 const TSON = (new Typeson() as any).register(structuredCloningThrowing);
 const encodeValue = (d: any) => JSON.stringify(TSON.encapsulate(d));
 const decodeValue = (s?: string) => s && TSON.revive(JSON.parse(s));
@@ -20,20 +22,20 @@ export interface DenoStorageAreaOptions {
 }
 
 export class DenoStorageArea implements StorageArea {
-  #db: Store;
+  #store: Store;
 
-  constructor(name: string = 'storage', { uri }: DenoStorageAreaOptions = { uri: 'sqlite://' }) {
+  constructor(name: string = DEFAULT_STORAGE_AREA_NAME, { uri }: DenoStorageAreaOptions = { uri: `sqlite://` }) {
     const x = new URL(uri);
     const protocol = x.protocol as `sqlite:` | `postgres:`
     switch (protocol) {
       case 'sqlite:': {
         const filename = uri.substr(9);
-        this.#db = new SQLiteStore({ table: name, filename });
+        this.#store = new SQLiteStore({ table: name, filename });
         break;
       }
       // case 'postgres:': {
       //   const uri = x.href as `postgres://${string}`;
-      //   this.#db = new PostgresStore({ table: name, uri });
+      //   this.#store = new PostgresStore({ table: name, uri });
       //   break;
       // }
       default: {
@@ -44,46 +46,46 @@ export class DenoStorageArea implements StorageArea {
 
   async get<T>(key: AllowedKey): Promise<T | undefined> {
     throwForDisallowedKey(key);
-    return decodeValue(await this.#db.get(encodeKey(key)));
+    return decodeValue(await this.#store.get(encodeKey(key)));
   }
 
   async set<T>(key: AllowedKey, value: T | undefined): Promise<void> {
     throwForDisallowedKey(key);
     if (value === undefined) {
-      await this.#db.delete(encodeKey(key));
+      await this.#store.delete(encodeKey(key));
     } else {
-      await this.#db.set(encodeKey(key), encodeValue(value));
+      await this.#store.set(encodeKey(key), encodeValue(value));
     }
   }
 
   async delete(key: AllowedKey) {
     throwForDisallowedKey(key);
-    await this.#db.delete(encodeKey(key));
+    await this.#store.delete(encodeKey(key));
   }
 
   async clear() {
-    await this.#db.clear();
+    await this.#store.clear();
   }
 
   async *keys(): AsyncGenerator<Key> {
-    for await (const key of this.#db.keys()) {
+    for await (const key of this.#store.keys()) {
       yield decodeKey(key);
     }
   }
 
   async *values<T>(): AsyncGenerator<T> {
-    for await (const value of this.#db.values()) {
+    for await (const value of this.#store.values()) {
       yield decodeValue(value);
     }
   }
 
   async *entries<T>(): AsyncGenerator<[Key, T]> {
-    for await (const [key, value] of this.#db.entries()) {
+    for await (const [key, value] of this.#store.entries()) {
       yield [decodeKey(key), decodeValue(value)];
     }
   }
 
   backingStore() {
-    return this.#db;
+    return this.#store.backingStore();
   }
 }
