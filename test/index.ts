@@ -2,7 +2,7 @@ import * as assert from "https://deno.land/std/testing/asserts.ts";
 
 import { DenoStorageArea } from '../src/mod.ts';
 
-const uri = 'sqlite://store.sqlite';
+const uri = 'sqlite://database.sqlite';
 
 const storage = new DenoStorageArea('default', { uri });
 
