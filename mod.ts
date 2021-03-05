@@ -37,7 +37,7 @@ export class DenoStorageArea implements StorageArea {
     const AdapterCtor = adapters.get(protocol);
 
     if (!AdapterCtor) {
-      throw Error(`Adapter for database protocol '${protocol}' not registered. Try importing '@worker-tools/deno-kv-storage/src/adapters/${protocol.replace(':', '')}.ts'`);
+      throw Error(`Adapter for database protocol '${protocol}' not registered. Try importing '@worker-tools/deno-kv-storage/adapters/${protocol.replace(':', '')}.ts'`);
     }
 
     this.#adapter = new AdapterCtor({ area: name, uri: dbURI });
