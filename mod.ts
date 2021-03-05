@@ -23,7 +23,7 @@ export interface DenoStorageAreaOptions {
 export class DenoStorageArea implements StorageArea {
   #adapter: Adapter;
 
-  static defaultURI: DB_URI
+  static defaultURI?: DB_URI
 
   constructor(name: string = DEFAULT_STORAGE_AREA_NAME, { uri }: DenoStorageAreaOptions = {}) {
     const dbURI = uri
