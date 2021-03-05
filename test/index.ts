@@ -1,7 +1,7 @@
 import * as assert from "https://deno.land/std/testing/asserts.ts";
 
 import { StorageArea } from '../src/mod.ts';
-import '../src/sqlite-store.ts';
+import '../src/adapters/sqlite.ts';
 
 Reflect.set(self, 'DENO_STORAGE_AREA__DEFAULT_URI', 'sqlite://database.sqlite');
 

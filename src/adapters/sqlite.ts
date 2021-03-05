@@ -1,8 +1,7 @@
 import { DB } from "https://deno.land/x/sqlite@v2.3.2/mod.ts";
 
-import { Store, storeRepository } from './store.ts';
+import { Adapter, adapters } from './mod.ts';
 
-// TODO: make table name configurable??
 const CREATE = 'CREATE TABLE IF NOT EXISTS [kv-storage] (area TEXT, key TEXT, value TEXT, PRIMARY KEY (area, key))';
 const GET = 'SELECT value FROM [kv-storage] WHERE key=:key AND area=:area';
 const UPSERT = 'INSERT INTO [kv-storage] (area, key, value) VALUES (:area, :key, :value) ON CONFLICT(area, key) DO UPDATE SET value=:value';
@@ -12,7 +11,7 @@ const KEYS = 'SELECT key FROM [kv-storage] WHERE area=:area';
 const VALUES = 'SELECT value FROM [kv-storage] WHERE area=:area';
 const ENTRIES = 'SELECT key, value FROM [kv-storage] WHERE area=:area';
 
-export class SQLiteStore implements Store {
+export class SQLiteAdapter implements Adapter {
   #db: DB;
   #area: string;
 
@@ -23,36 +22,40 @@ export class SQLiteStore implements Store {
     [...db.query(CREATE)];
   }
 
+  #query = (query: string, params?: { key?: string, value?: string }) => {
+    return [...this.#db.query(query, { ...params, area: this.#area })];
+  }
+
   async get(key: string): Promise<string | undefined> {
-    return [...this.#db.query(GET, { key, area: this.#area })][0]?.[0];
+    return this.#query(GET, { key })[0]?.[0];
   }
 
   async set(key: string, value: string) {
-    [...this.#db.query(UPSERT, { key, value, area: this.#area })];
+    this.#query(UPSERT, { key, value });
   }
 
   async delete(key: string) {
-    [...this.#db.query(DELETE, { key, area: this.#area })];
+    this.#query(DELETE, { key });
   }
 
   async clear() {
-    [...this.#db.query(CLEAR, { area: this.#area })];
+    this.#query(CLEAR);
   }
 
   async *keys() {
-    for (const [key] of this.#db.query(KEYS, { area: this.#area })) {
+    for (const [key] of this.#query(KEYS)) {
       yield key;
     }
   }
 
   async *values() {
-    for (const [value] of this.#db.query(VALUES, { area: this.#area })) {
+    for (const [value] of this.#query(VALUES)) {
       yield value;
     }
   }
 
   async *entries() {
-    for (const [key, value] of this.#db.query(ENTRIES, { area: this.#area })) {
+    for (const [key, value] of this.#query(ENTRIES)) {
       yield [key, value] as [string, string];
     }
   }
@@ -62,4 +65,4 @@ export class SQLiteStore implements Store {
   }
 }
 
-storeRepository.set('sqlite:', SQLiteStore);
+adapters.set('sqlite:', SQLiteAdapter);

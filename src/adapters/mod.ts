@@ -1,4 +1,4 @@
-export interface Store {
+export interface Adapter {
   get(key: string): Promise<string | undefined>;
   set(key: string, value: string): Promise<void>;
   delete(key: string): Promise<void>;
@@ -18,4 +18,4 @@ export type DB_URI =
   | `postgres://${string}`
 
 export type Class<T = unknown, Arguments extends any[] = any[]> = new(...arguments_: Arguments) => T;
-export const storeRepository = new Map<DBProtocol, Class<Store, [{ area: string, uri: DB_URI }]>>();
+export const adapters = new Map<DBProtocol, Class<Adapter, [{ area: string, uri: DB_URI }]>>();

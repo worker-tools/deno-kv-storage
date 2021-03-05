@@ -3,7 +3,7 @@ import { StorageArea, AllowedKey, Key } from 'https://cdn.skypack.dev/kv-storage
 import Typeson from 'https://cdn.skypack.dev/typeson@^5.18.2';
 import structuredCloningThrowing from 'https://cdn.skypack.dev/typeson-registry/dist/presets/structured-cloning-throwing.js';
 
-import { Store, storeRepository, DBProtocol, DB_URI } from './store.ts';
+import { Adapter, adapters, DBProtocol, DB_URI } from './adapters/mod.ts';
 import { throwForDisallowedKey } from './common.ts';
 import { encodeKey, decodeKey } from './key-encoding.ts';
 
@@ -21,70 +21,71 @@ export interface DenoStorageAreaOptions {
 }
 
 export class DenoStorageArea implements StorageArea {
-  #store: Store;
+  #adapter: Adapter;
 
   static defaultURI: DB_URI
 
   constructor(name: string = DEFAULT_STORAGE_AREA_NAME, { uri }: DenoStorageAreaOptions = {}) {
-    const dbURI = uri 
+    const dbURI = uri
       || DenoStorageArea.defaultURI
-      || Reflect.get(self, DEFAULT_URI_KEY) as DB_URI
+      || Reflect.get(self, DEFAULT_URI_KEY)
+      || Deno.env.get(DEFAULT_URI_KEY)
       || 'sqlite://';
 
     const x = new URL(dbURI);
     const protocol = x.protocol as DBProtocol;
-    const StoreCtor = storeRepository.get(protocol);
+    const AdapterCtor = adapters.get(protocol);
 
-    if (!StoreCtor) {
-      throw Error(`Adapter for database protocol '${protocol}' not registered. Try importing '@worker-tools/deno-kv-storage/src/${protocol.replace(':', '')}-store.ts'`);
+    if (!AdapterCtor) {
+      throw Error(`Adapter for database protocol '${protocol}' not registered. Try importing '@worker-tools/deno-kv-storage/src/adapters/${protocol.replace(':', '')}.ts'`);
     }
 
-    this.#store = new StoreCtor({ area: name, uri: dbURI });
+    this.#adapter = new AdapterCtor({ area: name, uri: dbURI });
   }
 
   async get<T>(key: AllowedKey): Promise<T | undefined> {
     throwForDisallowedKey(key);
-    return decodeValue(await this.#store.get(encodeKey(key)));
+    return decodeValue(await this.#adapter.get(encodeKey(key)));
   }
 
   async set<T>(key: AllowedKey, value: T | undefined): Promise<void> {
     throwForDisallowedKey(key);
     if (value === undefined) {
-      await this.#store.delete(encodeKey(key));
+      await this.#adapter.delete(encodeKey(key));
     } else {
-      await this.#store.set(encodeKey(key), encodeValue(value));
+      await this.#adapter.set(encodeKey(key), encodeValue(value));
     }
   }
 
   async delete(key: AllowedKey) {
     throwForDisallowedKey(key);
-    await this.#store.delete(encodeKey(key));
+    await this.#adapter.delete(encodeKey(key));
   }
 
   async clear() {
-    await this.#store.clear();
+    await this.#adapter.clear();
   }
 
   async *keys(): AsyncGenerator<Key> {
-    for await (const key of this.#store.keys()) {
+    for await (const key of this.#adapter.keys()) {
       yield decodeKey(key);
     }
   }
 
   async *values<T>(): AsyncGenerator<T> {
-    for await (const value of this.#store.values()) {
+    for await (const value of this.#adapter.values()) {
       yield decodeValue(value);
     }
   }
 
   async *entries<T>(): AsyncGenerator<[Key, T]> {
-    for await (const [key, value] of this.#store.entries()) {
+    for await (const [key, value] of this.#adapter.entries()) {
       yield [decodeKey(key), decodeValue(value)];
     }
   }
 
   backingStore() {
-    return this.#store.backingStore();
+    return this.#adapter.backingStore();
   }
 }
 
