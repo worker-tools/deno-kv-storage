@@ -8,3 +8,14 @@ export interface Store {
   entries(): AsyncIterableIterator<[string, string]>;
   backingStore(): unknown;
 }
+
+export type DBProtocol =
+  | `sqlite:`
+  | `postgres:`;
+
+export type DB_URI =
+  | `sqlite://${string}` 
+  | `postgres://${string}`
+
+export type Class<T = unknown, Arguments extends any[] = any[]> = new(...arguments_: Arguments) => T;
+export const storeRepository = new Map<DBProtocol, Class<Store, [{ area: string, uri: DB_URI }]>>();

@@ -1,6 +1,6 @@
 import { DB } from "https://deno.land/x/sqlite@v2.3.2/mod.ts";
 
-import { Store } from './store.ts';
+import { Store, storeRepository } from './store.ts';
 
 // TODO: make table name configurable??
 const CREATE = 'CREATE TABLE IF NOT EXISTS [kv-storage] (area TEXT, key TEXT, value TEXT, PRIMARY KEY (area, key))';
@@ -61,3 +61,5 @@ export class SQLiteStore implements Store {
     return this.#db;
   }
 }
+
+storeRepository.set('sqlite:', SQLiteStore);

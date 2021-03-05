@@ -3,13 +3,11 @@ import { StorageArea, AllowedKey, Key } from 'https://cdn.skypack.dev/kv-storage
 import Typeson from 'https://cdn.skypack.dev/typeson@^5.18.2';
 import structuredCloningThrowing from 'https://cdn.skypack.dev/typeson-registry/dist/presets/structured-cloning-throwing.js';
 
-import { Store } from './store.ts';
-import { SQLiteStore } from './sqlite-store.ts';
-// import { PostgresStore } from './postgres-store.ts';
-
+import { Store, storeRepository, DBProtocol, DB_URI } from './store.ts';
 import { throwForDisallowedKey } from './common.ts';
 import { encodeKey, decodeKey } from './key-encoding.ts';
 
+const DEFAULT_URI_KEY = 'DENO_STORAGE_AREA__DEFAULT_URI';
 const DEFAULT_STORAGE_AREA_NAME = 'default';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
@@ -18,30 +16,30 @@ const encodeValue = (d: any) => JSON.stringify(TSON.encapsulate(d));
 const decodeValue = (s?: string) => s && TSON.revive(JSON.parse(s));
 
 export interface DenoStorageAreaOptions {
-  uri: `sqlite://${string}` | `postgres://${string}`
+  uri?: DB_URI
+  [k: string]: any,
 }
 
 export class DenoStorageArea implements StorageArea {
   #store: Store;
 
-  constructor(name: string = DEFAULT_STORAGE_AREA_NAME, { uri }: DenoStorageAreaOptions = { uri: `sqlite://` }) {
-    const x = new URL(uri);
-    const protocol = x.protocol as `sqlite:` | `postgres:`
-    switch (protocol) {
-      case 'sqlite:': {
-        const filename = uri.substr(9);
-        this.#store = new SQLiteStore({ area: name, filename });
-        break;
-      }
-      // case 'postgres:': {
-      //   const uri = x.href as `postgres://${string}`;
-      //   this.#store = new PostgresStore({ area: name, uri });
-      //   break;
-      // }
-      default: {
-        throw Error(`Unsupported protocol: ${protocol}`);
-      }
+  static defaultURI: DB_URI
+
+  constructor(name: string = DEFAULT_STORAGE_AREA_NAME, { uri }: DenoStorageAreaOptions = {}) {
+    const dbURI = uri 
+      || DenoStorageArea.defaultURI
+      || Reflect.get(self, DEFAULT_URI_KEY) as DB_URI
+      || 'sqlite://';
+
+    const x = new URL(dbURI);
+    const protocol = x.protocol as DBProtocol;
+    const StoreCtor = storeRepository.get(protocol);
+
+    if (!StoreCtor) {
+      throw Error(`Adapter for database protocol '${protocol}' not registered. Try importing '@worker-tools/deno-kv-storage/src/${protocol.replace(':', '')}-store.ts'`);
     }
+
+    this.#store = new StoreCtor({ area: name, uri: dbURI });
   }
 
   async get<T>(key: AllowedKey): Promise<T | undefined> {
@@ -89,3 +87,5 @@ export class DenoStorageArea implements StorageArea {
     return this.#store.backingStore();
   }
 }
+
+export { DenoStorageArea as StorageArea };

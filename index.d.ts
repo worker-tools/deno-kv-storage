@@ -1,7 +1,14 @@
 import { StorageArea, AllowedKey, Key } from 'kv-storage-interface';
+
+export type DB_URI =
+  | `sqlite://${string}`
+  | `postgres://${string}`
+
 export interface DenoStorageAreaOptions {
-  uri: `sqlite://${string}` | `postgres://${string}`
+  uri?: DB_URI
+  [k: string]: any,
 }
+
 export class DenoStorageArea implements StorageArea {
   constructor(name: string, options?: DenoStorageAreaOptions);
   get<T>(key: AllowedKey): Promise<T | undefined>;
@@ -13,3 +20,5 @@ export class DenoStorageArea implements StorageArea {
   entries<T>(): AsyncIterableIterator<[Key, T]>;
   backingStore(): unknown;
 }
+
+export { DenoStorageArea as StorageArea };

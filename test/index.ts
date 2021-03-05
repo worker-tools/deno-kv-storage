@@ -1,10 +1,11 @@
 import * as assert from "https://deno.land/std/testing/asserts.ts";
 
-import { DenoStorageArea } from '../src/mod.ts';
+import { StorageArea } from '../src/mod.ts';
+import '../src/sqlite-store.ts';
 
-const uri = 'sqlite://database.sqlite';
+Reflect.set(self, 'DENO_STORAGE_AREA__DEFAULT_URI', 'sqlite://database.sqlite');
 
-const storage = new DenoStorageArea('default', { uri });
+const storage = new StorageArea();
 
 await storage.set('test', { a: 3 });
 assert.assertEquals(await storage.get('test'), { a: 3 });
@@ -23,7 +24,7 @@ await storage.set(['foo', 3, d], { c: 6 });
 assert.assertEquals(await storage.get(['foo', 3, d]), { c: 6 });
 
 // Use multiple storage areas
-const other = new DenoStorageArea('other_area', { uri });
+const other = new StorageArea('other_area');
 await other.set('test', { i: 11 });
 assert.assertEquals(await other.get('test'), { i: 11 });
 
@@ -41,6 +42,6 @@ ks = []; for await (const k of other.keys()) ks.push(k);
 assert.assertEquals(ks.length, 0);
 
 // Allow bad names
-assert.assertExists(new DenoStorageArea('[bad-name]', { uri }).set('a', 3));
-assert.assertExists(new DenoStorageArea('\u{1F602}\u{1F602}\u{1F602}', { uri }).set('b', 4));
-assert.assertExists(new DenoStorageArea(';DROP TABLE customers;', { uri }).set('c', 5));
+assert.assertExists(new StorageArea('[bad-name]').set('a', 3));
+assert.assertExists(new StorageArea('\u{1F602}\u{1F602}\u{1F602}').set('b', 4));
+assert.assertExists(new StorageArea(';DROP TABLE customers;').set('c', 5));
