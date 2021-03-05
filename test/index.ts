@@ -23,14 +23,14 @@ await storage.set(['foo', 3, d], { c: 6 });
 assert.assertEquals(await storage.get(['foo', 3, d]), { c: 6 });
 
 // Use multiple storage areas
-const other = new DenoStorageArea('otherarea', { uri });
+const other = new DenoStorageArea('other_area', { uri });
 await other.set('test', { i: 11 });
 assert.assertEquals(await other.get('test'), { i: 11 });
 
 // Allow bad names
-assert.assertExists(new DenoStorageArea('[bad-name]', { uri }));
-assert.assertExists(new DenoStorageArea('\u{1F602}\u{1F602}\u{1F602}', { uri }));
-assert.assertExists(new DenoStorageArea(';DROP TABLE customers;', { uri }));
+assert.assertExists(new DenoStorageArea('[bad-name]', { uri }).set('a', 3));
+assert.assertExists(new DenoStorageArea('\u{1F602}\u{1F602}\u{1F602}', { uri }).set('b', 4));
+assert.assertExists(new DenoStorageArea(';DROP TABLE customers;', { uri }).set('c', 5));
 
 let ks: any[];
 ks = []; for await (const k of other.keys()) ks.push(k);

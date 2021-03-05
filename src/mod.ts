@@ -30,12 +30,12 @@ export class DenoStorageArea implements StorageArea {
     switch (protocol) {
       case 'sqlite:': {
         const filename = uri.substr(9);
-        this.#store = new SQLiteStore({ table: name, filename });
+        this.#store = new SQLiteStore({ area: name, filename });
         break;
       }
       // case 'postgres:': {
       //   const uri = x.href as `postgres://${string}`;
-      //   this.#store = new PostgresStore({ table: name, uri });
+      //   this.#store = new PostgresStore({ area: name, uri });
       //   break;
       // }
       default: {
