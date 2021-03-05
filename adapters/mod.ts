@@ -18,4 +18,5 @@ export type DB_URI =
   | `postgres://${string}`
 
 export type Class<T = unknown, Arguments extends any[] = any[]> = new(...arguments_: Arguments) => T;
-export const adapters = new Map<DBProtocol, Class<Adapter, [{ area: string, uri: DB_URI }]>>();
+export type AdapterParams = { area: string, uri: DB_URI };
+export const adapters = new Map<DBProtocol, Class<Adapter, [AdapterParams]>>();

@@ -1,6 +1,6 @@
 import { DB } from "https://deno.land/x/sqlite@v2.3.2/mod.ts";
 
-import { Adapter, adapters } from './mod.ts';
+import { Adapter, AdapterParams, adapters } from './mod.ts';
 
 const CREATE = 'CREATE TABLE IF NOT EXISTS [kv-storage] (area TEXT, key TEXT, value TEXT, PRIMARY KEY (area, key))';
 const GET = 'SELECT value FROM [kv-storage] WHERE key=:key AND area=:area';
@@ -15,9 +15,10 @@ export class SQLiteAdapter implements Adapter {
   private db: DB;
   private area: string;
 
-  constructor({ area, filename }: { area: string, filename?: string }) {
+  constructor({ area, uri }: AdapterParams) {
     this.area = area;
 
+    const filename = uri.substr('sqlite://'.length);
     const db = this.db = new DB(['', 'memory'].includes(filename ?? '') ? ':memory:' : filename);
     [...db.query(CREATE)];
   }
