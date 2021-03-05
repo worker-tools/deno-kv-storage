@@ -12,56 +12,56 @@ const VALUES = 'SELECT value FROM [kv-storage] WHERE area=:area';
 const ENTRIES = 'SELECT key, value FROM [kv-storage] WHERE area=:area';
 
 export class SQLiteAdapter implements Adapter {
-  #db: DB;
-  #area: string;
+  private db: DB;
+  private area: string;
 
   constructor({ area, filename }: { area: string, filename?: string }) {
-    this.#area = area;
+    this.area = area;
 
-    const db = this.#db = new DB(['', 'memory'].includes(filename ?? '') ? ':memory:' : filename);
+    const db = this.db = new DB(['', 'memory'].includes(filename ?? '') ? ':memory:' : filename);
     [...db.query(CREATE)];
   }
 
-  #query = (query: string, params?: { key?: string, value?: string }) => {
-    return [...this.#db.query(query, { ...params, area: this.#area })];
+  query(query: string, params?: { key?: string, value?: string }) {
+    return [...this.db.query(query, { ...params, area: this.area })];
   }
 
   async get(key: string): Promise<string | undefined> {
-    return this.#query(GET, { key })[0]?.[0];
+    return this.query(GET, { key })[0]?.[0];
   }
 
   async set(key: string, value: string) {
-    this.#query(UPSERT, { key, value });
+    this.query(UPSERT, { key, value });
   }
 
   async delete(key: string) {
-    this.#query(DELETE, { key });
+    this.query(DELETE, { key });
   }
 
   async clear() {
-    this.#query(CLEAR);
+    this.query(CLEAR);
   }
 
   async *keys() {
-    for (const [key] of this.#query(KEYS)) {
+    for (const [key] of this.query(KEYS)) {
       yield key;
     }
   }
 
   async *values() {
-    for (const [value] of this.#query(VALUES)) {
+    for (const [value] of this.query(VALUES)) {
       yield value;
     }
   }
 
   async *entries() {
-    for (const [key, value] of this.#query(ENTRIES)) {
+    for (const [key, value] of this.query(ENTRIES)) {
       yield [key, value] as [string, string];
     }
   }
 
   backingStore() {
-    return this.#db;
+    return this.db;
   }
 }
 
