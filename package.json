@@ -15,7 +15,7 @@
   "scripts": {
     "test": "deno run --allow-read --allow-write test/index.ts",
     "prepack": "npm run build",
-    "build": "mkdir -p dist && deno bundle src/mod.ts > dist/index.js"
+    "build": "mkdir -p dist && deno bundle mod.ts > dist/index.js"
   },
   "author": "Florian Klampfer <mail@qwtel.com> (https://qwtel.com/)",
   "license": "MIT",
