@@ -27,10 +27,10 @@ const other = new DenoStorageArea('other_area', { uri });
 await other.set('test', { i: 11 });
 assert.assertEquals(await other.get('test'), { i: 11 });
 
-// Allow bad names
-assert.assertExists(new DenoStorageArea('[bad-name]', { uri }).set('a', 3));
-assert.assertExists(new DenoStorageArea('\u{1F602}\u{1F602}\u{1F602}', { uri }).set('b', 4));
-assert.assertExists(new DenoStorageArea(';DROP TABLE customers;', { uri }).set('c', 5));
+// Allow updates
+await other.set('test', { i: 12 });
+assert.assertEquals(await other.get('test'), { i: 12 });
+assert.assertEquals(await storage.get('test'), { a: 3 });
 
 let ks: any[];
 ks = []; for await (const k of other.keys()) ks.push(k);
@@ -39,3 +39,8 @@ assert.assertEquals(ks.length, 1);
 await other.clear();
 ks = []; for await (const k of other.keys()) ks.push(k);
 assert.assertEquals(ks.length, 0);
+
+// Allow bad names
+assert.assertExists(new DenoStorageArea('[bad-name]', { uri }).set('a', 3));
+assert.assertExists(new DenoStorageArea('\u{1F602}\u{1F602}\u{1F602}', { uri }).set('b', 4));
+assert.assertExists(new DenoStorageArea(';DROP TABLE customers;', { uri }).set('c', 5));
