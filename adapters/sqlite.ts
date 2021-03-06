@@ -15,10 +15,10 @@ export class SQLiteAdapter implements Adapter {
   private db: DB;
   private area: string;
 
-  constructor({ area, uri }: AdapterParams) {
+  constructor({ area, url }: AdapterParams) {
     this.area = area;
 
-    const filename = uri.substr('sqlite://'.length);
+    const filename = url.substr('sqlite://'.length);
     const db = this.db = new DB(['', 'memory'].includes(filename ?? '') ? ':memory:' : filename);
     [...db.query(CREATE)];
   }
