@@ -21,4 +21,5 @@ export class DenoStorageArea implements StorageArea {
   backingStore(): unknown;
 }
 
+export type { AllowedKey, Key } from 'kv-storage-interface';
 export { DenoStorageArea as StorageArea };

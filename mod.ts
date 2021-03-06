@@ -89,4 +89,5 @@ export class DenoStorageArea implements StorageArea {
   }
 }
 
+export type { AllowedKey, Key };
 export { DenoStorageArea as StorageArea };
