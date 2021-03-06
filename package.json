@@ -5,6 +5,14 @@
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./sqlite": {
+      "import": "./dist/sqlite.js"
+    }
+  },
   "types": "index.d.ts",
   "publishConfig": {
     "access": "public"
@@ -15,7 +23,9 @@
   "scripts": {
     "test": "deno run --allow-read --allow-write test/index.ts",
     "prepack": "npm run build",
-    "build": "mkdir -p dist && deno bundle mod.ts > dist/index.js"
+    "build": "npm run build:mod && npm run build:sqlite",
+    "build:mod": "mkdir -p dist && deno bundle mod.ts > dist/index.js",
+    "build:sqlite": "mkdir -p dist && deno bundle sqlite.ts > dist/sqlite.js"
   },
   "author": "Florian Klampfer <mail@qwtel.com> (https://qwtel.com/)",
   "license": "MIT",
