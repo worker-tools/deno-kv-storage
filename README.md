@@ -12,7 +12,7 @@ KV Storage is still a good interface for asynchronous data access that feels nat
 
 ```ts
 // file: "mod.ts"
-import { StorageArea } from 'https://cdn.skypack.dev/@worker-tools/deno-kv-storage/sqlite.ts?dts';
+import { StorageArea } from 'https://deno.land/x/kvstorage/sqlite.ts';
 
 const storage = new StorageArea();
 
@@ -66,5 +66,4 @@ Beyond the cross-worker-env aspects of using StorageArea, it aso provides a numb
 ## Disclaimers
 
 Note that efficiency is not a goal. Specifically, if you have sizable `ArrayBuffer`s,
-it's much better to use Cloudflare's KV directly.
-
+it's better to use a database implementation with proper support for binary data.
