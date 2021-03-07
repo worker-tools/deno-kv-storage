@@ -23,7 +23,7 @@ export class SQLiteAdapter implements Adapter {
     [...db.query(CREATE)];
   }
 
-  query(query: string, params?: { key?: string, value?: string }) {
+  private query(query: string, params?: { key?: string, value?: string }) {
     return [...this.db.query(query, { ...params, area: this.area })];
   }
 

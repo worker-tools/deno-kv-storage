@@ -1,3 +1,5 @@
 // Same as `mod.ts`, but with the SQLite adapter pre-imported.
 import './adapters/sqlite.ts';
-export * from './mod.ts';
+import { StorageArea, DenoStorageArea, DenoStorageAreaOptions, AllowedKey, Key } from './mod.ts';
+export { StorageArea, DenoStorageArea };
+export type { DenoStorageAreaOptions, AllowedKey, Key };

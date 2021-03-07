@@ -16,17 +16,17 @@ const encodeValue = (d: any) => JSON.stringify(TSON.encapsulate(d));
 const decodeValue = (s?: string) => s && TSON.revive(JSON.parse(s));
 
 export interface DenoStorageAreaOptions {
-  url?: DB_URL
+  url?: DB_URL,
   [k: string]: any,
 }
 
 export class DenoStorageArea implements StorageArea {
-  #adapter: Adapter;
+  #store: Adapter;
 
-  static defaultURL?: DB_URL
+  static defaultURL?: DB_URL;
 
-  constructor(name: string = DEFAULT_STORAGE_AREA_NAME, { url }: DenoStorageAreaOptions = {}) {
-    const dbURL = url
+  constructor(name: string = DEFAULT_STORAGE_AREA_NAME, options: DenoStorageAreaOptions = {}) {
+    const dbURL = options.url
       || DenoStorageArea.defaultURL
       || Reflect.get(self, DEFAULT_URL_KEY)
       || Deno.env.get(DEFAULT_URL_KEY)
@@ -40,52 +40,52 @@ export class DenoStorageArea implements StorageArea {
       throw Error(`Adapter for database protocol '${protocol}' not registered. Try importing '@worker-tools/deno-kv-storage/adapters/${protocol.replace(':', '')}.ts'`);
     }
 
-    this.#adapter = new AdapterCtor({ area: name, url: dbURL });
+    this.#store = new AdapterCtor({ area: name, url: dbURL });
   }
 
   async get<T>(key: AllowedKey): Promise<T | undefined> {
     throwForDisallowedKey(key);
-    return decodeValue(await this.#adapter.get(encodeKey(key)));
+    return decodeValue(await this.#store.get(encodeKey(key)));
   }
 
   async set<T>(key: AllowedKey, value: T | undefined): Promise<void> {
     throwForDisallowedKey(key);
     if (value === undefined) {
-      await this.#adapter.delete(encodeKey(key));
+      await this.#store.delete(encodeKey(key));
     } else {
-      await this.#adapter.set(encodeKey(key), encodeValue(value));
+      await this.#store.set(encodeKey(key), encodeValue(value));
     }
   }
 
   async delete(key: AllowedKey) {
     throwForDisallowedKey(key);
-    await this.#adapter.delete(encodeKey(key));
+    await this.#store.delete(encodeKey(key));
   }
 
   async clear() {
-    await this.#adapter.clear();
+    await this.#store.clear();
   }
 
   async *keys(): AsyncGenerator<Key> {
-    for await (const key of this.#adapter.keys()) {
+    for await (const key of this.#store.keys()) {
       yield decodeKey(key);
     }
   }
 
   async *values<T>(): AsyncGenerator<T> {
-    for await (const value of this.#adapter.values()) {
+    for await (const value of this.#store.values()) {
       yield decodeValue(value);
     }
   }
 
   async *entries<T>(): AsyncGenerator<[Key, T]> {
-    for await (const [key, value] of this.#adapter.entries()) {
+    for await (const [key, value] of this.#store.entries()) {
       yield [decodeKey(key), decodeValue(value)];
     }
   }
 
   backingStore() {
-    return this.#adapter.backingStore();
+    return this.#store.backingStore();
   }
 }
 
