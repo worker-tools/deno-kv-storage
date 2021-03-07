@@ -1,11 +1,10 @@
 import { StorageArea, AllowedKey, Key } from 'kv-storage-interface';
 
-export type DB_URI =
-  | `sqlite://${string}`
-  | `postgres://${string}`
+export type DBProtocol = `${string}:`;
+export type DB_URL = `${DBProtocol}//${string}`;
 
 export interface DenoStorageAreaOptions {
-  uri?: DB_URI
+  url?: DB_URL,
   [k: string]: any,
 }
 
