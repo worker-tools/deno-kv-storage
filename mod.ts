@@ -1,11 +1,9 @@
 import { StorageArea, AllowedKey, Key } from 'https://cdn.skypack.dev/kv-storage-interface@^0.2.0/index.d.ts';
-
+import { encodeKey, decodeKey, throwForDisallowedKey } from 'https://cdn.skypack.dev/idb-key-to-string@^0.2.0?dts';
 import Typeson from 'https://cdn.skypack.dev/typeson@^5.18.2';
 import structuredCloningThrowing from 'https://cdn.skypack.dev/typeson-registry/dist/presets/structured-cloning-throwing.js';
 
 import { Adapter, adapters, DBProtocol, DB_URL } from './adapters/mod.ts';
-import { throwForDisallowedKey } from './common.ts';
-import { encodeKey, decodeKey } from './key-encoding.ts';
 
 const DEFAULT_URL_KEY = 'DENO_STORAGE_AREA__DEFAULT_URL';
 const DEFAULT_STORAGE_AREA_NAME = 'default';

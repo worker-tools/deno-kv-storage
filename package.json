@@ -30,6 +30,9 @@
   "author": "Florian Klampfer <mail@qwtel.com> (https://qwtel.com/)",
   "license": "MIT",
   "dependencies": {
-    "kv-storage-interface": "^0.2.0"
+    "idb-key-to-string": "^0.1.0",
+    "kv-storage-interface": "^0.2.0",
+    "typeson": "^5.18.2",
+    "typeson-registry": "^1.0.0-alpha.39"
   }
 }
