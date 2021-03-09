@@ -1,19 +1,15 @@
 {
   "name": "@worker-tools/deno-kv-storage",
-  "description": "",
+  "description": "An implementation of the StorageArea interface for Deno with an extensible system for supporting various database backends",
   "version": "0.3.5",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js"
-    },
-    "./sqlite": {
-      "import": "./dist/sqlite.js"
-    }
-  },
   "types": "index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./sqlite": "./dist/sqlite.js"
+  },
   "publishConfig": {
     "access": "public"
   },
