@@ -19,6 +19,7 @@
     "test": "test"
   },
   "scripts": {
+    "clean": " shx rm -rf dist *.tgz",
     "test": "deno run --allow-read --allow-write test/index.ts",
     "prepack": "npm run clean && npm run build",
     "build": "npm run build:mod && npm run build:sqlite",
