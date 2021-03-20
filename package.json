@@ -8,7 +8,9 @@
   "types": "index.d.ts",
   "exports": {
     ".": "./dist/index.js",
-    "./sqlite": "./dist/sqlite.js"
+    "./sqlite": "./dist/sqlite.js",
+    "./mod.ts": "./mod.ts",
+    "./sqlite.ts": "./sqlite.ts"
   },
   "publishConfig": {
     "access": "public"
@@ -18,10 +20,10 @@
   },
   "scripts": {
     "test": "deno run --allow-read --allow-write test/index.ts",
-    "prepack": "npm run build",
+    "prepack": "npm run clean && npm run build",
     "build": "npm run build:mod && npm run build:sqlite",
-    "build:mod": "mkdir -p dist && deno bundle mod.ts > dist/index.js",
-    "build:sqlite": "mkdir -p dist && deno bundle sqlite.ts > dist/sqlite.js"
+    "build:mod": "shx mkdir -p dist && deno bundle mod.ts > dist/index.js",
+    "build:sqlite": "shx mkdir -p dist && deno bundle sqlite.ts > dist/sqlite.js"
   },
   "author": "Florian Klampfer <mail@qwtel.com> (https://qwtel.com/)",
   "license": "MIT",
@@ -30,5 +32,8 @@
     "kv-storage-interface": "^0.2.0",
     "typeson": "^5.18.2",
     "typeson-registry": "^1.0.0-alpha.39"
+  },
+  "devDependencies": {
+    "shx": "^0.3.3"
   }
 }
