@@ -1,7 +1,7 @@
 {
   "name": "@worker-tools/deno-kv-storage",
   "description": "An implementation of the StorageArea interface for Deno with an extensible system for supporting various database backends",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
