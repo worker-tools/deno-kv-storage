@@ -30,9 +30,8 @@ export class DenoStorageArea implements StorageArea {
       || Deno.env.get(DEFAULT_URL_KEY)
       || 'sqlite://';
 
-    const x = new URL(dbURL);
-    const protocol = x.protocol as DBProtocol;
-    const AdapterCtor = adapters.get(protocol);
+    const { protocol } = new URL(dbURL);
+    const AdapterCtor = adapters.get(protocol as DBProtocol);
 
     if (!AdapterCtor) {
       throw Error(`Adapter for database protocol '${protocol}' not registered. Try importing 'adapters/${protocol.replace(':', '')}.ts'`);

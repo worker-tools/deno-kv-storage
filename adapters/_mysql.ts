@@ -1,9 +1,14 @@
+/**
+ * WIP MySQL Adapter
+ * Work abandoned due to primary key size limitations, as well as predictable crash of the mysql library when
+ * writing large (~16 MB) TEXT fields...
+ */
 import { Client, ClientConfig, configLogger } from "https://deno.land/x/mysql/mod.ts";
 
 import { Adapter, AdapterParams, adapters } from './mod.ts';
 
 // FIXME: 255 char limitation for key => Not good
-const CREATE = 'CREATE TABLE IF NOT EXISTS kv_storage (area VARCHAR(255), rkey VARCHAR(511), value TEXT, PRIMARY KEY (area, rkey))';
+const CREATE = 'CREATE TABLE IF NOT EXISTS kv_storage (area VARCHAR(255), rkey VARCHAR(511), value JSON, PRIMARY KEY (area, rkey))';
 const GET = 'SELECT value FROM kv_storage WHERE area=? AND rkey=?';
 const UPSERT = 'REPLACE INTO kv_storage (area, rkey, value) VALUES (?, ?, ?)';
 const DELETE = 'DELETE FROM kv_storage WHERE area=? AND rkey=?';
