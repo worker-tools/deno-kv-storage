@@ -12,19 +12,24 @@ const VALUES = 'SELECT value FROM [kv-storage] WHERE area=:area';
 const ENTRIES = 'SELECT key, value FROM [kv-storage] WHERE area=:area';
 
 export class SQLiteAdapter implements Adapter {
-  private db: DB;
+  private filename: string;
   private area: string;
 
   constructor({ area, url }: AdapterParams) {
     this.area = area;
 
     const filename = url.substr('sqlite://'.length);
-    const db = this.db = new DB(['', 'memory'].includes(filename ?? '') ? ':memory:' : filename);
+    this.filename = ['', 'memory'].includes(filename ?? '') ? ':memory:' : filename;
+    const db = new DB(this.filename);
     [...db.query(CREATE)];
+    db.close()
   }
 
   private query(query: string, params?: { key?: string, value?: string }) {
-    return [...this.db.query(query, { ...params, area: this.area })];
+    const db = new DB(this.filename);
+    const ret =  [...db.query(query, { ...params, area: this.area })];
+    db.close();
+    return ret;
   }
 
   async get(key: string): Promise<string | undefined> {
@@ -62,7 +67,7 @@ export class SQLiteAdapter implements Adapter {
   }
 
   backingStore() {
-    return this.db;
+    return new DB(this.filename);
   }
 }
 

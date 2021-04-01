@@ -9,8 +9,10 @@
   "exports": {
     ".": "./dist/index.js",
     "./sqlite": "./dist/sqlite.js",
+    "./postgres": "./dist/postgres.js",
     "./mod.ts": "./mod.ts",
-    "./sqlite.ts": "./sqlite.ts"
+    "./sqlite.ts": "./sqlite.ts",
+    "./postgres.ts": "./postgres.ts"
   },
   "publishConfig": {
     "access": "public"
@@ -22,9 +24,10 @@
     "clean": " shx rm -rf dist *.tgz",
     "test": "deno run --allow-read --allow-write test/index.ts",
     "prepack": "npm run clean && npm run build",
-    "build": "npm run build:mod && npm run build:sqlite",
+    "build": "npm run build:mod && npm run build:sqlite && npm run build:postgres",
     "build:mod": "shx mkdir -p dist && deno bundle mod.ts > dist/index.js",
-    "build:sqlite": "shx mkdir -p dist && deno bundle sqlite.ts > dist/sqlite.js"
+    "build:sqlite": "shx mkdir -p dist && deno bundle sqlite.ts > dist/sqlite.js",
+    "build:postgres": "shx mkdir -p dist && deno bundle postgres.ts > dist/postgres.js"
   },
   "author": "Florian Klampfer <mail@qwtel.com> (https://qwtel.com/)",
   "license": "MIT",

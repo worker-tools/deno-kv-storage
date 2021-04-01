@@ -12,30 +12,35 @@ const VALUES = 'SELECT value FROM kv_storage WHERE area=$1';
 const ENTRIES = 'SELECT key, value FROM kv_storage WHERE area=$1';
 
 export class PostgresAdapter implements Adapter {
-  private client: Client;
   private area: string;
+  private url: string;
   private ready: Promise<void>;
 
   constructor({ area, url }: AdapterParams) {
     this.area = area;
-
-    const client = this.client = new Client(url);
+    this.url = url;
 
     this.ready = (async () => {
       // TODO error??
+      const client = new Client(url);
       await client.connect();
       // https://stackoverflow.com/questions/26150758/suppressing-notice-relation-exists-when-using-create-if-not-exists
       await client.queryArray(`SET client_min_messages = warning`);
       await client.queryArray(CREATE);
+      await client.end();
     })();
   }
 
   private async query(query: string, { key, value }: { key?: string, value?: string } = {}) {
     await this.ready;
-    return (await this.client.queryArray<any>({ 
+    const client = new Client(this.url);
+    await client.connect();
+    const ret =  (await client.queryArray<any>({ 
       text: query, 
       args: [this.area, ...key ? [key] : [], ...value ? [value]: []], 
     })).rows;
+    await client.end();
+    return ret;
   }
 
   async get(key: string): Promise<string | undefined> {
@@ -43,15 +48,15 @@ export class PostgresAdapter implements Adapter {
   }
 
   async set(key: string, value: string) {
-    this.query(UPSERT, { key, value });
+    await this.query(UPSERT, { key, value });
   }
 
   async delete(key: string) {
-    this.query(DELETE, { key });
+    await this.query(DELETE, { key });
   }
 
   async clear() {
-    this.query(CLEAR);
+    await this.query(CLEAR);
   }
 
   async *keys() {
@@ -73,7 +78,7 @@ export class PostgresAdapter implements Adapter {
   }
 
   backingStore() {
-    return this.client;
+    return new Client(this.url);
   }
 }
 
