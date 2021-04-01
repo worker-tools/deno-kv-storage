@@ -3,9 +3,11 @@ import * as assert from "https://deno.land/std/testing/asserts.ts";
 import { StorageArea } from '../mod.ts';
 import '../adapters/sqlite.ts';
 import '../adapters/postgres.ts';
+import '../adapters/_mysql.ts';
 
 // Reflect.set(self, 'DENO_STORAGE_AREA__DEFAULT_URL', 'sqlite://database.sqlite');
 // Reflect.set(self, 'DENO_STORAGE_AREA__DEFAULT_URL', 'postgres://qwtel:@localhost:5432/postgres');
+// Reflect.set(self, 'DENO_STORAGE_AREA__DEFAULT_URL', 'mysql://root:@127.0.0.1/test');
 
 Deno.test('create storage area', async () => {
   const storage = new StorageArea();
@@ -47,8 +49,10 @@ Deno.test('use multiple storage areas', async () => {
 Deno.test('iterate keys', async () => {
   const other = new StorageArea('other_area_2');
   await other.set('test', { i: 11 });
+  await other.set('fest', { i: 12 });
   let ks = []; for await (const k of other.keys()) ks.push(k);
-  assert.assertEquals(ks.length, 1);
+  assert.assertEquals(ks.length, 2);
+  assert.assertEquals(new Set(ks), new Set(['fest', 'test']));
 });
 
 Deno.test('clear', async () => {
@@ -58,10 +62,40 @@ Deno.test('clear', async () => {
   await other.clear();
   let ks = []; for await (const k of other.keys()) ks.push(k);
   assert.assertEquals(ks.length, 0);
+  assert.assertEquals(ks, []);
+});
+
+Deno.test('allow utf8 values', async () => {
+  const storage = new StorageArea();
+  await storage.set('xx', '\u{1F602}\u{1F602}\u{1F602}')
+  assert.assertEquals(await storage.get('xx'), '\u{1F602}\u{1F602}\u{1F602}');
+  await storage.set('xy', { a: '\u{1F602}\u{1F602}\u{1F602}' })
+  assert.assertEquals(await storage.get('xy'), { a: '\u{1F602}\u{1F602}\u{1F602}' });
 });
 
 Deno.test('allow bad names', async () => {
   assert.assertEquals(await new StorageArea('[bad-name]').set('a', 3), undefined);
-  assert.assertEquals(await new StorageArea('\u{1F602}\u{1F602}\u{1F602}').set('b', 4), undefined);
   assert.assertEquals(await new StorageArea(';DROP TABLE customers;').set('c', 5), undefined);
+  assert.assertEquals(await new StorageArea('\u{1F602}\u{1F602}\u{1F602}').set('b', 4), undefined);
 });
+
+Deno.test('accepts at least 255 bytes per key', async () => {
+  const storage = new StorageArea();
+  const k = crypto.getRandomValues(new Uint8Array(255));
+  await storage.set(k, true);
+  assert.assertEquals(await storage.get(k), true);
+});
+
+Deno.test('accepts larger keys', async () => {
+  const storage = new StorageArea();
+  const k = crypto.getRandomValues(new Uint8Array(1024));
+  await storage.set(k, true);
+  assert.assertEquals(await storage.get(k), true);
+});
+
+// Deno.test('accepts largest keys', async () => {
+//   const storage = new StorageArea();
+//   const k = crypto.getRandomValues(new Uint8Array(65536));
+//   await storage.set(k, true);
+//   assert.assertEquals(await storage.get(k), true);
+// });
