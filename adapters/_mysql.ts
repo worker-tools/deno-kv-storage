@@ -3,7 +3,7 @@ import { Client, ClientConfig, configLogger } from "https://deno.land/x/mysql/mo
 import { Adapter, AdapterParams, adapters } from './mod.ts';
 
 // FIXME: 255 char limitation for key => Not good
-const CREATE = 'CREATE TABLE IF NOT EXISTS kv_storage (area VARCHAR(255), rkey VARCHAR(510), value TEXT, PRIMARY KEY (area, rkey))';
+const CREATE = 'CREATE TABLE IF NOT EXISTS kv_storage (area VARCHAR(255), rkey VARCHAR(511), value TEXT, PRIMARY KEY (area, rkey))';
 const GET = 'SELECT value FROM kv_storage WHERE area=? AND rkey=?';
 const UPSERT = 'REPLACE INTO kv_storage (area, rkey, value) VALUES (?, ?, ?)';
 const DELETE = 'DELETE FROM kv_storage WHERE area=? AND rkey=?';
