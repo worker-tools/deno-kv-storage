@@ -1,4 +1,5 @@
 import * as assert from "https://deno.land/std/testing/asserts.ts";
+import { concatUint8Arrays } from 'https://cdn.skypack.dev/typed-array-utils?dts';
 
 import { StorageArea } from '../mod.ts';
 import '../adapters/sqlite.ts';
@@ -6,7 +7,7 @@ import '../adapters/postgres.ts';
 import '../adapters/_mysql.ts';
 
 // Reflect.set(self, 'DENO_STORAGE_AREA__DEFAULT_URL', 'sqlite://database.sqlite');
-// Reflect.set(self, 'DENO_STORAGE_AREA__DEFAULT_URL', 'postgres://qwtel:@localhost:5432/postgres');
+// Reflect.set(self, 'DENO_STORAGE_AREA__DEFAULT_URL', 'postgres://deno:node@localhost:5432/test');
 // Reflect.set(self, 'DENO_STORAGE_AREA__DEFAULT_URL', 'mysql://root:@127.0.0.1/test');
 
 Deno.test('create storage area', async () => {
@@ -93,9 +94,22 @@ Deno.test('accepts larger keys', async () => {
   assert.assertEquals(await storage.get(k), true);
 });
 
+function make16MB() {
+  const u8s = [];
+  for (let i = 0; i < 256; i++) u8s.push(crypto.getRandomValues(new Uint8Array(65536)));
+  return concatUint8Arrays(...u8s);
+}
+
+Deno.test('write/read 16 MB', async () => {
+  const storage = new StorageArea();
+  const data = make16MB();
+  await storage.set('data', data);
+  assert.assertEquals((await storage.get<Uint8Array>('data'))?.byteLength, data.byteLength);
+});
+
 // Deno.test('accepts largest keys', async () => {
 //   const storage = new StorageArea();
-//   const k = crypto.getRandomValues(new Uint8Array(65536));
-//   await storage.set(k, true);
-//   assert.assertEquals(await storage.get(k), true);
+//   const data = crypto.getRandomValues(new Uint8Array(65536));
+//   await storage.set(data, true);
+//   assert.assertEquals(await storage.get(data), true);
 // });
