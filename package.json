@@ -22,7 +22,9 @@
   },
   "scripts": {
     "clean": " shx rm -rf dist *.tgz",
-    "test": "deno run --allow-read --allow-write test/index.ts",
+    "test": "npm run test:sqlite && npm run test:postgres",
+    "test:sqlite": "DENO_STORAGE_AREA__DEFAULT_URL=sqlite://database.sqlite deno test --allow-read --allow-write --allow-env test/index.ts",
+    "test:postgres": "DENO_STORAGE_AREA__DEFAULT_URL=postgres://deno:node@localhost:5432/postgres deno test --allow-net --allow-env --unstable test/index.ts",
     "prepack": "npm run clean && npm run build",
     "build": "npm run build:mod && npm run build:sqlite && npm run build:postgres",
     "build:mod": "shx mkdir -p dist && deno bundle mod.ts > dist/index.js",

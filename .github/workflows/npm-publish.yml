@@ -18,7 +18,13 @@ jobs:
           node-version: 12
       - uses: maximousblk/setup-deno@v1
         with:
-          version: '1.8.0'
+          version: '1.8.2'
+      - name: Setup PostgreSQL on Ubuntu
+        run: |
+          sudo systemctl start postgresql.service
+          pg_isready
+          sudo -u postgres psql --command="CREATE USER deno PASSWORD 'node'"
+          sudo -u postgres createdb --owner=deno test
       - run: npm ci
       - run: npm test
 
@@ -33,7 +39,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - uses: maximousblk/setup-deno@v1
         with:
-          version: '1.8.0'
+          version: '1.8.2'
       - run: npm ci
       - run: npm publish
         env:

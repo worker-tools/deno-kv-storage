@@ -5,7 +5,7 @@ import '../adapters/sqlite.ts';
 import '../adapters/postgres.ts';
 
 // Reflect.set(self, 'DENO_STORAGE_AREA__DEFAULT_URL', 'sqlite://database.sqlite');
-Reflect.set(self, 'DENO_STORAGE_AREA__DEFAULT_URL', 'postgres://qwtel:@localhost:5432/postgres');
+// Reflect.set(self, 'DENO_STORAGE_AREA__DEFAULT_URL', 'postgres://qwtel:@localhost:5432/postgres');
 
 Deno.test('create storage area', async () => {
   const storage = new StorageArea();
