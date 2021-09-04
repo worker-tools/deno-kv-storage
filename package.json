@@ -37,7 +37,7 @@
   "dependencies": {
     "idb-key-to-string": "^0.2.0",
     "kv-storage-interface": "^0.2.0",
-    "typeson": "^5.18.2",
+    "typeson": "^6.1.0",
     "typeson-registry": "^1.0.0-alpha.39"
   },
   "devDependencies": {
