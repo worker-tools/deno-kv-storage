@@ -27,6 +27,8 @@ jobs:
           sudo -u postgres createdb --owner=deno test
       - run: npm ci
       - run: npm test
+        env: 
+          DENO_TLS_CA_STORE: system,mozilla
 
   publish-npm:
     needs: build
