@@ -18,7 +18,7 @@ jobs:
           node-version: 12
       - uses: maximousblk/setup-deno@v1
         with:
-          version: '1.8.2'
+          version: '1.13.2'
       - name: Setup PostgreSQL on Ubuntu
         run: |
           sudo systemctl start postgresql.service
