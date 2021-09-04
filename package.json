@@ -24,7 +24,7 @@
     "clean": " shx rm -rf dist *.tgz",
     "test": "npm run test:sqlite && npm run test:postgres",
     "test:sqlite": "DENO_STORAGE_AREA__DEFAULT_URL=sqlite://database.sqlite deno test --allow-read --allow-write --allow-env --seed 1 test/index.ts",
-    "test:postgres": "DENO_STORAGE_AREA__DEFAULT_URL=postgres://deno:node@localhost:5432/test deno test --allow-net --allow-env --seed 1 --unstable test/index.ts",
+    "test:postgres": "DENO_STORAGE_AREA__DEFAULT_URL=postgres://deno:node@localhost:5432/test deno test --allow-net --allow-env --seed 1 --unstable --unsafely-ignore-certificate-errors test/index.ts",
     "test:mysql": "DENO_STORAGE_AREA__DEFAULT_URL=mysql://root:@127.0.0.1/test deno test --allow-net --allow-env --seed 1 test/index.ts",
     "prepack": "npm run clean && npm run build",
     "build": "npm run build:mod && npm run build:sqlite && npm run build:postgres",
