@@ -41,6 +41,6 @@
     "typeson-registry": "^1.0.0-alpha.39"
   },
   "devDependencies": {
-    "shx": "^0.3.3"
+    "shx": "^0.3.4"
   }
 }
