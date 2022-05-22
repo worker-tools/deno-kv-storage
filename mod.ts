@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import type { StorageArea, AllowedKey, Key } from 'https://ghuc.cc/qwtel/kv-storage-interface/index.d.ts';
-import { encodeKey, decodeKey, throwForDisallowedKey } from 'https://cdn.skypack.dev/idb-key-to-string@^0.2.0?dts';
+import { encodeKey, decodeKey, throwForDisallowedKey } from 'https://cdn.skypack.dev/idb-key-to-string?dts';
 
 import { default as typeson } from 'https://cdn.skypack.dev/typeson@7.0.2?dts';
 import { structuredCloningThrowing } from 'https://unpkg.com/typeson-registry@3.0.0/dist/index.js';
