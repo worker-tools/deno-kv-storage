@@ -30,6 +30,8 @@ jobs:
   publish-npm:
     needs: test
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
       - uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
