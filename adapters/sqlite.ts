@@ -1,4 +1,5 @@
-import { DB } from "https://deno.land/x/sqlite@v2.3.2/mod.ts";
+// deno-lint-ignore-file require-await
+import { DB } from "https://deno.land/x/sqlite@v2.5.0/mod.ts";
 
 import { Adapter, AdapterParams, adapters } from './mod.ts';
 

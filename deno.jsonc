@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "clean": " rm -rf dist",
+    "test": "deno task test-sqlite && deno task test-postgres",
+    "test-sqlite": "export DEFAULT_KV_URL=sqlite://database.sqlite && deno test --allow-read --allow-write --allow-env --seed 1 test/index.ts",
+    "test-postgres": "export DEFAULT_KV_URL=postgres://deno:node@localhost:5432/test && deno test --allow-net --allow-env --seed 1 --unstable --unsafely-ignore-certificate-errors test/index.ts",
+    // "test-mysql": "export DEFAULT_KV_URL=mysql://root:@127.0.0.1/test && deno test --allow-net --allow-env --seed 1 test/index.ts",
+  },
+}

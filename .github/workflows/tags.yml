@@ -1,0 +1,47 @@
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
+
+name: Node.js Package
+
+on:
+  push:
+    tags: 
+      - v*
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      - name: Setup PostgreSQL on Ubuntu
+        run: |
+          sudo systemctl start postgresql.service
+          pg_isready
+          sudo -u postgres psql --command="CREATE USER deno PASSWORD 'node'"
+          sudo -u postgres createdb --owner=deno test
+      - run: deno task test
+
+  # publish-npm:
+  #   needs: test
+  #   runs-on: ubuntu-latest
+  #     - uses: denoland/setup-deno@v1
+  #       with:
+  #         deno-version: v1.x
+  #     - uses: actions/setup-node@v1
+  #       with:
+  #         node-version: 16
+  #         registry-url: https://registry.npmjs.org/
+  #     - uses: pnpm/action-setup@v2
+  #       with:
+  #         version: 7
+  #         run_install: false
+  #     - run: deno run -A ./scripts/build_npm.ts
+  #     - run: cd ./npm && npm publish
+  #       env:
+  #         NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

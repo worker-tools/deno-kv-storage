@@ -1,4 +1,4 @@
-import { Client } from "https://deno.land/x/postgres/mod.ts";
+import { Client } from "https://deno.land/x/postgres@v0.15.0/mod.ts";
 
 import { Adapter, AdapterParams, adapters } from './mod.ts';
 

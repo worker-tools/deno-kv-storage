@@ -1,15 +1,18 @@
-import { StorageArea, AllowedKey, Key } from 'https://cdn.skypack.dev/kv-storage-interface@^0.2.0/index.d.ts';
+// deno-lint-ignore-file no-explicit-any
+import type { StorageArea, AllowedKey, Key } from 'https://ghuc.cc/qwtel/kv-storage-interface/index.d.ts';
 import { encodeKey, decodeKey, throwForDisallowedKey } from 'https://cdn.skypack.dev/idb-key-to-string@^0.2.0?dts';
-import Typeson from 'https://cdn.skypack.dev/typeson@^5.18.2';
-import structuredCloningThrowing from 'https://cdn.skypack.dev/typeson-registry/dist/presets/structured-cloning-throwing.js';
+
+import { default as typeson } from 'https://cdn.skypack.dev/typeson@7.0.2?dts';
+import { structuredCloningThrowing } from 'https://unpkg.com/typeson-registry@3.0.0/dist/index.js';
 
 import { Adapter, adapters, DBProtocol, DB_URL } from './adapters/mod.ts';
 
-const DEFAULT_URL_KEY = 'DENO_STORAGE_AREA__DEFAULT_URL';
+const OLD_DEFAULT_URL_KEY = 'DENO_STORAGE_AREA__DEFAULT_URL';
+const DEFAULT_URL_KEY = 'DEFAULT_KV_URL';
 const DEFAULT_STORAGE_AREA_NAME = 'default';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
-const TSON = (new Typeson() as any).register(structuredCloningThrowing);
+const TSON = new typeson.Typeson().register([structuredCloningThrowing]);
 const encodeValue = (d: any) => JSON.stringify(TSON.encapsulate(d));
 const decodeValue = (s?: string) => s && TSON.revive(JSON.parse(s));
 
@@ -27,7 +30,9 @@ export class DenoStorageArea implements StorageArea {
     const dbURL = options.url
       || DenoStorageArea.defaultURL
       || Reflect.get(self, DEFAULT_URL_KEY)
+      || Reflect.get(self, OLD_DEFAULT_URL_KEY)
       || Deno.env.get(DEFAULT_URL_KEY)
+      || Deno.env.get(OLD_DEFAULT_URL_KEY)
       || 'sqlite://';
 
     const { protocol } = new URL(dbURL);

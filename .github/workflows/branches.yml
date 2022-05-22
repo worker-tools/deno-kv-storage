@@ -9,21 +9,20 @@ on:
       - master
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: 12
-      - uses: maximousblk/setup-deno@v1
+          node-version: 16
+      - uses: denoland/setup-deno@v1
         with:
-          version: '1.13.2'
+          deno-version: v1.x
       - name: Setup PostgreSQL on Ubuntu
         run: |
           sudo systemctl start postgresql.service
           pg_isready
           sudo -u postgres psql --command="CREATE USER deno PASSWORD 'node'"
           sudo -u postgres createdb --owner=deno test
-      - run: npm ci
-      - run: npm test
+      - run: deno task test
