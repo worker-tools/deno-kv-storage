@@ -15,21 +15,19 @@ const ENTRIES = 'SELECT key, value FROM [kv-storage] WHERE area=:area';
 export class SQLiteAdapter implements Adapter {
   private filename: string;
   private area: string;
+  private db: DB;
 
   constructor({ area, url }: AdapterParams) {
     this.area = area;
 
-    const filename = url.substr('sqlite://'.length);
+    const filename = url.substring('sqlite://'.length);
     this.filename = ['', 'memory'].includes(filename ?? '') ? ':memory:' : filename;
-    const db = new DB(this.filename);
+    const db = this.db = new DB(this.filename);
     [...db.query(CREATE)];
-    db.close()
   }
 
   private query(query: string, params?: { key?: string, value?: string }) {
-    const db = new DB(this.filename);
-    const ret =  [...db.query(query, { ...params, area: this.area })];
-    db.close();
+    const ret =  [...this.db.query(query, { ...params, area: this.area })];
     return ret;
   }
 

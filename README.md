@@ -12,7 +12,7 @@ KV Storage is still a good interface for asynchronous data access that feels nat
 
 ```ts
 // file: "mod.ts"
-import { StorageArea } from 'https://deno.land/x/kvstorage/sqlite.ts';
+import { StorageArea } from 'https://deno.land/x/kv_storage/sqlite.ts';
 
 const storage = new StorageArea();
 
