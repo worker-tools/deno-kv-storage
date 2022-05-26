@@ -14,66 +14,90 @@ const ENTRIES = 'SELECT key, value FROM kv_storage WHERE area=$1';
 export class PostgresAdapter implements Adapter {
   private area: string;
   private url: string;
-  private ready: Promise<void>;
+  private init: Promise<void>;
+  private client?: Client;
 
   constructor({ area, url }: AdapterParams) {
     this.area = area;
     this.url = url;
 
-    this.ready = (async () => {
-      // TODO error??
-      const client = new Client(url);
+    this.init = (async () => {
+      const client = this.client = new Client(url);
       await client.connect();
       // https://stackoverflow.com/questions/26150758/suppressing-notice-relation-exists-when-using-create-if-not-exists
       await client.queryArray(`SET client_min_messages = warning`);
       await client.queryArray(CREATE);
-      await client.end();
+      this.keepOpen()
     })();
   }
 
+  private keepOpen() {
+    queueMicrotask(() => {
+      if (this.client?.connected) this.client.end()
+      delete this.client;
+    })
+  }
+
   private async query(query: string, { key, value }: { key?: string, value?: string } = {}) {
-    await this.ready;
-    const client = new Client(this.url);
-    await client.connect();
-    const ret =  (await client.queryArray<any>({ 
-      text: query, 
-      args: [this.area, ...key ? [key] : [], ...value ? [value]: []], 
+    await this.init;
+    const client = this.client ||= new Client(this.url);
+    if (!client.connected) await client.connect();
+    const ret = (await client.queryArray<any>({
+      text: query,
+      args: [this.area, ...key ? [key] : [], ...value ? [value] : []],
     })).rows;
-    await client.end();
+    this.keepOpen()
     return ret;
   }
 
   async get(key: string): Promise<string | undefined> {
-    return (await this.query(GET, { key }))[0]?.[0];
+    const res = (await this.query(GET, { key }))[0]?.[0];
+    this.keepOpen()
+    return res;
   }
 
   async set(key: string, value: string) {
     await this.query(UPSERT, { key, value });
+    this.keepOpen()
   }
 
   async delete(key: string) {
     await this.query(DELETE, { key });
+    this.keepOpen()
   }
 
   async clear() {
     await this.query(CLEAR);
+    this.keepOpen()
   }
 
   async *keys() {
-    for (const [key] of await this.query(KEYS)) {
-      yield key;
+    try {
+      for (const [key] of await this.query(KEYS)) {
+        yield key;
+      }
+    } finally {
+      this.keepOpen()
     }
   }
 
   async *values() {
-    for (const [value] of await this.query(VALUES)) {
-      yield value;
+    try {
+      for (const [value] of await this.query(VALUES)) {
+        yield value;
+      }
+    } finally {
+      this.keepOpen()
     }
   }
 
   async *entries() {
-    for (const [key, value] of await this.query(ENTRIES)) {
-      yield [key, value] as [string, string];
+    try {
+      for (const [key, value] of await this.query(ENTRIES)) {
+        yield [key, value] as [string, string];
+      }
+    } finally {
+      this.keepOpen()
     }
   }
 

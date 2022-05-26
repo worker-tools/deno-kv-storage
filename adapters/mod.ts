@@ -5,7 +5,7 @@ export interface Adapter {
   clear(): Promise<void>;
   keys(): AsyncIterableIterator<string>;
   values(): AsyncIterableIterator<string>;
-  entries(): AsyncIterableIterator<[string, string]>;
+  entries(): AsyncIterableIterator<readonly [string, string]>;
   backingStore(): unknown;
 }
 
