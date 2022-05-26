@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 export interface Adapter {
   get(key: string): Promise<string | undefined>;
   set(key: string, value: string): Promise<void>;

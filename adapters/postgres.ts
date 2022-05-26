@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import { Client } from "https://deno.land/x/postgres@v0.15.0/mod.ts";
 
 import { Adapter, AdapterParams, adapters } from './mod.ts';
