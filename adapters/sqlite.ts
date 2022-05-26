@@ -30,8 +30,8 @@ export class SQLiteAdapter implements Adapter {
   }
 
   private keepOpen() {
-    queueMicrotask(() => {
-      if (!this.memory && this.refs === 0) {
+    if (!this.memory) queueMicrotask(() => {
+      if (this.refs === 0) {
         this.db?.close()
         delete this.db;
       }
