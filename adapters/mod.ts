@@ -14,4 +14,6 @@ export type DBProtocol = `${string}:`;
 export type DB_URL = `${DBProtocol}//${string}`;
 export type Class<T = unknown, Arguments extends any[] = any[]> = new(...arguments_: Arguments) => T;
 export type AdapterParams = { area: string, url: DB_URL };
-export const adapters = new Map<DBProtocol, Class<Adapter, [AdapterParams]>>();
+export type AdapterClass = Class<Adapter, [AdapterParams]>;
+
+(<any>globalThis).deno_storage_area__adapters ||= new Map<DBProtocol, AdapterClass>();

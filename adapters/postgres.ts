@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 import { Client } from "https://deno.land/x/postgres@v0.15.0/mod.ts";
 
-import { Adapter, AdapterParams, adapters } from './mod.ts';
+import type { Adapter, AdapterParams } from './mod.ts';
 
 const CREATE = 'CREATE TABLE IF NOT EXISTS kv_storage (area TEXT, key TEXT, value TEXT, PRIMARY KEY (area, key))';
 const GET = 'SELECT value FROM kv_storage WHERE key=$2 AND area=$1';
@@ -107,4 +107,5 @@ export class PostgresAdapter implements Adapter {
   }
 }
 
-adapters.set('postgres:', PostgresAdapter);
+// @ts-ignore: ...
+(globalThis.deno_storage_area__adapters ||= new Map()).set('postgres:', PostgresAdapter);

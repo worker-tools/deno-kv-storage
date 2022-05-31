@@ -1,7 +1,7 @@
 // deno-lint-ignore-file require-await
 import { DB } from "https://deno.land/x/sqlite@v2.5.0/mod.ts";
 
-import { Adapter, AdapterParams, adapters } from './mod.ts';
+import type { Adapter, AdapterParams } from './mod.ts';
 
 const CREATE = 'CREATE TABLE IF NOT EXISTS [kv-storage] (area TEXT, key TEXT, value TEXT, PRIMARY KEY (area, key))';
 const GET = 'SELECT value FROM [kv-storage] WHERE key=:key AND area=:area';
@@ -106,4 +106,5 @@ export class SQLiteAdapter implements Adapter {
   }
 }
 
-adapters.set('sqlite:', SQLiteAdapter);
+// @ts-ignore: ...
+(globalThis.deno_storage_area__adapters ||= new Map()).set('sqlite:', SQLiteAdapter);

@@ -5,7 +5,7 @@
  */
 import { Client, ClientConfig, configLogger } from "https://deno.land/x/mysql/mod.ts";
 
-import { Adapter, AdapterParams, adapters } from './mod.ts';
+import { Adapter, AdapterParams } from './mod.ts';
 
 // FIXME: 255 char limitation for key => Not good
 const CREATE = 'CREATE TABLE IF NOT EXISTS kv_storage (area VARCHAR(255), rkey VARCHAR(511), value JSON, PRIMARY KEY (area, rkey))';
@@ -101,4 +101,5 @@ export class MySQLAdapter implements Adapter {
   }
 }
 
-adapters.set('mysql:', MySQLAdapter);
+// @ts-ignore: ...
+(globalThis.deno_storage_area__adapters ||= new Map()).set('mysql:', MySQLAdapter);

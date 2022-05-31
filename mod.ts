@@ -5,7 +5,7 @@ import { encodeKey, decodeKey, throwForDisallowedKey } from 'https://cdn.skypack
 import * as typeson from 'https://cdn.skypack.dev/typeson@7.0.2?dts';
 import { structuredCloningThrowing } from 'https://unpkg.com/typeson-registry@3.0.0/dist/index.js';
 
-import { Adapter, adapters, DBProtocol, DB_URL } from './adapters/mod.ts';
+import type { Adapter, DBProtocol, AdapterClass, DB_URL } from './adapters/mod.ts';
 
 const OLD_DEFAULT_URL_KEY = 'DENO_STORAGE_AREA__DEFAULT_URL';
 const DEFAULT_URL_KEY = 'DEFAULT_KV_URL';
@@ -36,6 +36,7 @@ export class DenoStorageArea implements StorageArea {
       || 'sqlite://';
 
     const { protocol } = new URL(dbURL);
+    const adapters: Map<DBProtocol, AdapterClass> = (<any>globalThis).deno_storage_area__adapters || new Map()
     const AdapterCtor = adapters.get(protocol as DBProtocol);
 
     if (!AdapterCtor) {
